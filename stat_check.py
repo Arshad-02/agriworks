@@ -1,3 +1,4 @@
+import requests
 import json
 from datetime import datetime
 
@@ -19,9 +20,33 @@ mins = int(check_data["timestamp"].split(":")[1])
 stat = check_data["status"]
 print("timestamp",hrs,mins,sep=':')
 print("current time",crnt_hrs,crnt_mins,sep = ':')
-
+notif_msg = "No Action required"
 #check every two mins
 if(hrs==crnt_hrs and (abs(crnt_mins-mins)<=30)):
     print("proceed with data")
     if(stat==2):
-        print("Attention required")
+        notif_msg = "Attention required"
+
+
+
+serverToken = 'your server key here'
+deviceToken = 'device token here'
+
+headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'key=' + serverToken,
+      }
+
+body = {
+          'notification': {'title': 'Crop status',
+                            'body': notif_msg
+                            },
+          'to':
+              deviceToken,
+          'priority': 'high',
+        #   'data': dataPayLoad,
+        }
+response = requests.post("https://fcm.googleapis.com/fcm/send",headers = headers, data=json.dumps(body))
+print(response.status_code)
+
+print(response.json())
